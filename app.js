@@ -19,6 +19,8 @@
      risqué au doigt. Choix assumé ici — mobile et tablette ont droit aux
      mêmes scènes que le desktop. */
   const staticMode = reduced;
+  const cursorFxMq = matchMedia('(hover: hover) and (pointer: fine) and (min-width: 769px)');
+  const cursorFxOn = () => cursorFxMq.matches && !reduced;
 
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -207,27 +209,20 @@
     }));
   }
 
-  /* souris : parallaxe douce du pasteboard + champ de points */
+  /* souris : parallaxe douce du pasteboard + champ de points
+     (desktop seulement — pas de suivi au doigt). */
   let mx = 0, my = 0, mxT = 0, myT = 0;
   let pointerX = 0, pointerY = 0, pointerOn = false;
   addEventListener('mousemove', (e) => {
+    if (!cursorFxOn()) return;
     mxT = (e.clientX / vw - 0.5) * 2;
     myT = (e.clientY / vh - 0.5) * 2;
-    if (!pointerOn) { ringX = e.clientX; ringY = e.clientY; }
     pointerX = e.clientX;
     pointerY = e.clientY;
     pointerOn = true;
   }, { passive: true });
   addEventListener('mouseout', (e) => {
     if (!e.relatedTarget && !e.toElement) pointerOn = false;
-  });
-  const cursorRing = $('#cursorRing');
-  let ringX = 0, ringY = 0, ringHot = false;
-  addEventListener('mouseover', (e) => {
-    const hot = !!e.target.closest && e.target.closest('a, button');
-    if (!!hot === ringHot) return;
-    ringHot = !!hot;
-    if (cursorRing) cursorRing.classList.toggle('is-hot', ringHot);
   });
 
   /* champ de points : grille fixe, points qui s'écartent et
@@ -270,7 +265,7 @@
         dots.push(x, y);
       }
     }
-    drawDots(reduced || !pointerOn);
+    drawDots(!cursorFxOn() || !pointerOn);
   }
 
   function drawDots(forceStatic) {
@@ -278,7 +273,7 @@
     const w = innerWidth, h = innerHeight;
     dotCtx.clearRect(0, 0, w, h);
     const n = dots.length;
-    const staticGrid = forceStatic || reduced;
+    const staticGrid = forceStatic || !cursorFxOn();
     const rad = Math.min(280, Math.max(160, Math.min(w, h) * 0.34));
     const rad2 = rad * rad;
     const inf = staticGrid ? 0 : dotInf;
@@ -314,6 +309,15 @@
       dotCtx.fill();
     }
   }
+
+  const stopCursorFx = () => {
+    pointerOn = false;
+    mxT = myT = mx = my = 0;
+    dotInf = 0;
+    drawDots(true);
+  };
+  if (cursorFxMq.addEventListener) cursorFxMq.addEventListener('change', (e) => { if (!e.matches) stopCursorFx(); });
+  else if (cursorFxMq.addListener) cursorFxMq.addListener((e) => { if (!e.matches) stopCursorFx(); });
 
   /* ═══════════ SYSTÈME DE SCÈNES ═══════════ */
   const scenes = [];
@@ -637,15 +641,7 @@
       if (Math.abs(current - target) < 0.05) current = target;
       mx = lerp(mx, mxT, 0.06);
       my = lerp(my, myT, 0.06);
-      if (!reduced && cursorRing) {
-        if (pointerOn) {
-          ringX = lerp(ringX, pointerX, 0.32);
-          ringY = lerp(ringY, pointerY, 0.32);
-        }
-        cursorRing.style.transform = `translate3d(${ringX.toFixed(1)}px, ${ringY.toFixed(1)}px, 0) translate(-50%, -50%)`;
-        cursorRing.classList.toggle('is-on', pointerOn);
-      }
-      if (!reduced && (pointerOn || dotInf > 0.01)) {
+      if (cursorFxOn() && (pointerOn || dotInf > 0.01)) {
         const aimX = pointerOn ? pointerX : dotCx;
         const aimY = pointerOn ? pointerY : dotCy;
         dotCx = lerp(dotCx, aimX, 0.18);

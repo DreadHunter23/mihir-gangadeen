@@ -56,31 +56,6 @@ html { scroll-behavior: auto; }
   .dotfield { opacity: 0.4; }
 }
 
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 52px;
-  height: 52px;
-  border: 1.5px solid rgba(var(--ink-rgb), 0.85);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 90;
-  opacity: 0;
-  transform: translate3d(-80px, -80px, 0) translate(-50%, -50%);
-  will-change: transform, opacity;
-  transition: width .28s var(--ease-out), height .28s var(--ease-out), border-color .28s;
-}
-.cursor-ring.is-on { opacity: 1; }
-.cursor-ring.is-hot {
-  width: 64px;
-  height: 64px;
-  border-color: var(--lime);
-}
-@media (prefers-reduced-motion: reduce) {
-  .cursor-ring { display: none; }
-}
-
 body {
   background: var(--bone);
   color: var(--ink);
