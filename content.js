@@ -101,30 +101,7 @@ window.SITE_CONTENT = {
     kicker: 'UN BESOIN À RELIER ?',
     email: 'mihirrgangadeen@gmail.com',
     reassurance: 'RÉPONSE SOUS 48 H — BILINGUE ANGLAIS & FRANÇAIS'
-  },
-
-  trail: [
-    'images/trail-01.jpg',
-    'images/trail-02.jpg',
-    'images/trail-03.jpg',
-    'images/trail-04.jpg',
-    'images/trail-05.jpg',
-    'images/trail-06.jpg',
-    'images/trail-07.jpg',
-    'images/trail-08.jpg',
-    'images/trail-09.jpg',
-    'images/trail-10.jpg',
-    'images/trail-11.jpg',
-    'images/trail-12.jpg',
-    'images/trail-13.jpg',
-    'images/trail-14.jpg',
-    'images/trail-15.jpg',
-    'images/trail-16.jpg',
-    'images/trail-17.jpg',
-    'images/trail-18.jpg',
-    'images/trail-19.jpg',
-    'images/trail-20.jpg'
-  ]
+  }
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -229,7 +206,6 @@ window.SITE_CONTENT = {
   if (fs4) {
     fs4.innerHTML = `${C.objections.finale} <span class="pill" id="pillPhrase">${C.objections.pill}<svg class="pill-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="pillPath" d="M50,6 C88,4 98,22 97,50 C96,82 76,96 49,95 C16,94 3,76 4,48 C5,18 20,7 50,6 Z"/></svg></span>`;
   }
-  $$('#trail img').forEach((img, i) => { img.src = C.trail[i % C.trail.length]; });
 
   // 10 · conversion
   set('.footer-kicker', C.contact.kicker);

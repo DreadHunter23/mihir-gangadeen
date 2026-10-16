@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <canvas class="dotfield" id="dotfield" aria-hidden="true"></canvas>
+  <div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
 
   <!-- ══════════ PRELOADER ══════════ -->
   <div class="loader" id="loader" aria-hidden="true">
@@ -139,7 +141,7 @@
       </div>
     </section>
 
-    <!-- ─── SCÈNE 9 · OBJECTIONS — PHRASES + TRAÎNÉE D'IMAGES SOUS LA SOURIS ─── -->
+    <!-- ─── SCÈNE 9 · OBJECTIONS ─── -->
     <section class="scene s-final" id="final" data-pin="2.6">
       <div class="pin">
         <p class="final-text">
@@ -148,30 +150,6 @@
           <span class="fs" id="fs3">Pas de filtres.</span><br>
           <span class="fs" id="fs4">Juste vous, <span class="pill" id="pillPhrase">en vrai.<svg class="pill-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path id="pillPath" d="M50,6 C88,4 98,22 97,50 C96,82 76,96 49,95 C16,94 3,76 4,48 C5,18 20,7 50,6 Z"/></svg></span></span>
         </p>
-
-        <!-- réserve d'images pour la traînée sous la souris -->
-        <div class="trail" id="trail" aria-hidden="true">
-          <img src="https://picsum.photos/id/21/220/280"   style="--tw:150px" alt="">
-          <img src="https://picsum.photos/id/64/240/300"   style="--tw:190px" alt="">
-          <img src="https://picsum.photos/id/660/200/260"  style="--tw:120px" alt="">
-          <img src="https://picsum.photos/id/835/230/280"  style="--tw:200px" alt="">
-          <img src="https://picsum.photos/id/1057/280/340" style="--tw:96px"  alt="">
-          <img src="https://picsum.photos/id/568/220/270"  style="--tw:170px" alt="">
-          <img src="https://picsum.photos/id/824/210/260"  style="--tw:34px"  alt="">
-          <img src="https://picsum.photos/id/177/230/290"  style="--tw:140px" alt="">
-          <img src="https://picsum.photos/id/804/230/300"  style="--tw:200px" alt="">
-          <img src="https://picsum.photos/id/1062/240/200" style="--tw:110px" alt="">
-          <img src="https://picsum.photos/id/553/230/180"  style="--tw:28px"  alt="">
-          <img src="https://picsum.photos/id/978/240/300"  style="--tw:160px" alt="">
-          <img src="https://picsum.photos/id/853/280/340"  style="--tw:130px" alt="">
-          <img src="https://picsum.photos/id/591/230/280"  style="--tw:180px" alt="">
-          <img src="https://picsum.photos/id/655/220/270"  style="--tw:40px"  alt="">
-          <img src="https://picsum.photos/id/575/240/290"  style="--tw:150px" alt="">
-          <img src="https://picsum.photos/id/319/240/180"  style="--tw:120px" alt="">
-          <img src="https://picsum.photos/id/823/240/310"  style="--tw:200px" alt="">
-          <img src="https://picsum.photos/id/1011/230/290" style="--tw:100px" alt="">
-          <img src="https://picsum.photos/id/838/240/290"  style="--tw:170px" alt="">
-        </div>
       </div>
     </section>
 

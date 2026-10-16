@@ -7,19 +7,17 @@
    · bande lime diagonale à lettres dispersées + doodle dessiné
    · processus : zoom plein écran → rideau de lames → compteur odomètre
    · témoignage : le chiffre-clé qui monte, la citation dessous
-   · finale : phrases encrées, ratures dessinées, traînée sous la souris
+   · finale : phrases encrées, ratures dessinées
    ═══════════════════════════════════════════════════════════ */
 (() => {
   'use strict';
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const touch = matchMedia('(hover: none), (pointer: coarse)').matches;
   /* Le mode statique ne se déclenche plus QUE sur « prefers-reduced-motion ».
      Le template d'origine y basculait aussi sur tout appareil tactile et sous
      900 px : le scroll scrubé détourne le défilement natif, ce qui est plus
      risqué au doigt. Choix assumé ici — mobile et tablette ont droit aux
-     mêmes scènes que le desktop. `touch` reste calculé : il sert à la
-     traînée souris, qui n'a pas de sens sans curseur. */
+     mêmes scènes que le desktop. */
   const staticMode = reduced;
 
   const lerp = (a, b, t) => a + (b - a) * t;
@@ -209,12 +207,113 @@
     }));
   }
 
-  /* souris : parallaxe douce du pasteboard */
+  /* souris : parallaxe douce du pasteboard + champ de points */
   let mx = 0, my = 0, mxT = 0, myT = 0;
+  let pointerX = 0, pointerY = 0, pointerOn = false;
   addEventListener('mousemove', (e) => {
     mxT = (e.clientX / vw - 0.5) * 2;
     myT = (e.clientY / vh - 0.5) * 2;
+    if (!pointerOn) { ringX = e.clientX; ringY = e.clientY; }
+    pointerX = e.clientX;
+    pointerY = e.clientY;
+    pointerOn = true;
   }, { passive: true });
+  addEventListener('mouseout', (e) => {
+    if (!e.relatedTarget && !e.toElement) pointerOn = false;
+  });
+  const cursorRing = $('#cursorRing');
+  let ringX = 0, ringY = 0, ringHot = false;
+  addEventListener('mouseover', (e) => {
+    const hot = !!e.target.closest && e.target.closest('a, button');
+    if (!!hot === ringHot) return;
+    ringHot = !!hot;
+    if (cursorRing) cursorRing.classList.toggle('is-hot', ringHot);
+  });
+
+  /* champ de points : grille fixe, points qui s'écartent et
+     s'éclairent autour du curseur. Canvas derrière les scènes. */
+  const dotCanvas = $('#dotfield');
+  const dotCtx = dotCanvas ? dotCanvas.getContext('2d', { alpha: true }) : null;
+  let dots = [];
+  let dotCx = -1e4, dotCy = -1e4, dotInf = 0;
+  let inkR = 242, inkG = 241, inkB = 236;
+  let limeR = 169, limeG = 231, limeB = 245;
+
+  function hexToRgb(hex) {
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec((hex || '').trim());
+    return m ? `${parseInt(m[1], 16)}, ${parseInt(m[2], 16)}, ${parseInt(m[3], 16)}` : null;
+  }
+
+  function layoutDots() {
+    if (!dotCtx || !dotCanvas) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const w = innerWidth, h = innerHeight;
+    dotCanvas.width = Math.round(w * dpr);
+    dotCanvas.height = Math.round(h * dpr);
+    dotCanvas.style.width = w + 'px';
+    dotCanvas.style.height = h + 'px';
+    dotCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cs = getComputedStyle(document.documentElement);
+    const ink = (cs.getPropertyValue('--ink-rgb') || '242, 241, 236').split(',').map((n) => +n);
+    inkR = ink[0]; inkG = ink[1]; inkB = ink[2];
+    const lime = hexToRgb(cs.getPropertyValue('--lime'));
+    if (lime) {
+      const p = lime.split(',').map((n) => +n);
+      limeR = p[0]; limeG = p[1]; limeB = p[2];
+    }
+    const gap = w < 720 ? 34 : 28;
+    const ox = (w % gap) / 2 + gap / 2;
+    const oy = (h % gap) / 2 + gap / 2;
+    dots = [];
+    for (let y = oy; y <= h + 1; y += gap) {
+      for (let x = ox; x <= w + 1; x += gap) {
+        dots.push(x, y);
+      }
+    }
+    drawDots(reduced || !pointerOn);
+  }
+
+  function drawDots(forceStatic) {
+    if (!dotCtx) return;
+    const w = innerWidth, h = innerHeight;
+    dotCtx.clearRect(0, 0, w, h);
+    const n = dots.length;
+    const staticGrid = forceStatic || reduced;
+    const rad = Math.min(280, Math.max(160, Math.min(w, h) * 0.34));
+    const rad2 = rad * rad;
+    const inf = staticGrid ? 0 : dotInf;
+    const cx = dotCx, cy = dotCy;
+    for (let i = 0; i < n; i += 2) {
+      const x = dots[i], y = dots[i + 1];
+      let px = x, py = y, t = 0;
+      if (inf > 0.01) {
+        const dx = x - cx, dy = y - cy;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < rad2) {
+          const dist = Math.sqrt(d2) || 0.001;
+          t = (1 - dist / rad) * inf;
+          t = t * t * (3 - 2 * t);
+          const push = 36 * t;
+          px = x + (dx / dist) * push;
+          py = y + (dy / dist) * push;
+        }
+      }
+      const size = 1.05 + t * 2.4;
+      const a = 0.12 + t * 0.82;
+      dotCtx.beginPath();
+      dotCtx.arc(px, py, size, 0, Math.PI * 2);
+      if (t > 0.35) {
+        const k = (t - 0.35) / 0.65;
+        const r = inkR + (limeR - inkR) * k;
+        const g = inkG + (limeG - inkG) * k;
+        const b = inkB + (limeB - inkB) * k;
+        dotCtx.fillStyle = `rgba(${r | 0}, ${g | 0}, ${b | 0}, ${a.toFixed(3)})`;
+      } else {
+        dotCtx.fillStyle = `rgba(${inkR}, ${inkG}, ${inkB}, ${a.toFixed(3)})`;
+      }
+      dotCtx.fill();
+    }
+  }
 
   /* ═══════════ SYSTÈME DE SCÈNES ═══════════ */
   const scenes = [];
@@ -498,46 +597,6 @@
     pillDraw(1 - seg(p, 0.56, 0.72));
   });
 
-  /* traînée d'images sous la souris (comme l'original) :
-     chaque déplacement dépose la photo suivante de la réserve
-     à la position du curseur ; elle surgit puis s'efface. */
-  const sceneFinal = scenes.find((s) => s.root.classList.contains('s-final'));
-  const trailImgs = $$('#trail img');
-  let trailIdx = 0, trailZ = 10, trailAcc = 0, trailX = null, trailY = null;
-
-  addEventListener('mousemove', (e) => {
-    if (staticMode || !sceneFinal) return;
-    if (current + vh < sceneFinal.start || current > sceneFinal.start + sceneFinal.len + vh) {
-      trailX = trailY = null;
-      return;
-    }
-    if (trailX === null) { trailX = e.clientX; trailY = e.clientY; return; }
-    trailAcc += Math.hypot(e.clientX - trailX, e.clientY - trailY);
-    trailX = e.clientX; trailY = e.clientY;
-    if (trailAcc < 38) return;
-    trailAcc = 0;
-    const r = sceneFinal.pin.getBoundingClientRect();
-    spawnTrail(e.clientX - r.left, e.clientY - r.top);
-  }, { passive: true });
-
-  function spawnTrail(x, y) {
-    const img = trailImgs[trailIdx % trailImgs.length];
-    trailIdx++;
-    const rot = ((trailIdx * 47) % 17) - 8;
-    img.style.zIndex = ++trailZ;
-    img.getAnimations().forEach((a) => a.cancel());
-    const at = (s) => `translate(${x.toFixed(0)}px, ${y.toFixed(0)}px) translate(-50%, -50%) rotate(${rot}deg) scale(${s})`;
-    img.animate(
-      [
-        { opacity: 0, transform: at(0.5) },
-        { opacity: 1, transform: at(1), offset: 0.14 },
-        { opacity: 1, transform: at(1), offset: 0.72 },
-        { opacity: 0, transform: at(0.94) }
-      ],
-      { duration: 3600, easing: 'cubic-bezier(0.19, 1, 0.22, 1)', fill: 'forwards' }
-    );
-  }
-
   /* ═══════════ MESURE GLOBALE ═══════════ */
   let docH = 1;
   function measure() {
@@ -554,6 +613,7 @@
     if (!staticMode) document.body.style.height = docH + 'px';
     cacheReveals();
     cacheParallax();
+    layoutDots();
   }
 
   /* ═══════════ RENDU ═══════════ */
@@ -577,6 +637,22 @@
       if (Math.abs(current - target) < 0.05) current = target;
       mx = lerp(mx, mxT, 0.06);
       my = lerp(my, myT, 0.06);
+      if (!reduced && cursorRing) {
+        if (pointerOn) {
+          ringX = lerp(ringX, pointerX, 0.32);
+          ringY = lerp(ringY, pointerY, 0.32);
+        }
+        cursorRing.style.transform = `translate3d(${ringX.toFixed(1)}px, ${ringY.toFixed(1)}px, 0) translate(-50%, -50%)`;
+        cursorRing.classList.toggle('is-on', pointerOn);
+      }
+      if (!reduced && (pointerOn || dotInf > 0.01)) {
+        const aimX = pointerOn ? pointerX : dotCx;
+        const aimY = pointerOn ? pointerY : dotCy;
+        dotCx = lerp(dotCx, aimX, 0.18);
+        dotCy = lerp(dotCy, aimY, 0.18);
+        dotInf = lerp(dotInf, pointerOn ? 1 : 0, 0.12);
+        drawDots();
+      }
       render(current);
     }
     requestAnimationFrame(frame);
