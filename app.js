@@ -415,7 +415,6 @@
       lastFillIdx = idx;
     }
     boxDraw(1 - seg(p, 0.42, 0.56));
-    fillText.classList.toggle('greyed', p > 0.68);
   });
 
   /* arrivée désordonnée des cartes : chacune surgit du bas, décalée

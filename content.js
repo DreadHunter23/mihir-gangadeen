@@ -19,7 +19,7 @@ window.SITE_CONTENT = {
     ]
   },
 
-  nav: { proof: 'EXPERTISE', universes: 'MÉTHODE', cta: 'CONTACT' },
+  nav: { proof: 'SKILLS', universes: 'MÉTHODE', cta: 'CONTACT' },
 
   hook: {
     line1: 'Du code au métier,',
@@ -47,17 +47,31 @@ window.SITE_CONTENT = {
     text: 'Quatre ans à relier le métier et la plateforme, de Laravel à Salesforce. Sales Cloud tient le pipeline en production ; Experience Cloud tend le CRM aux clients et partenaires — une TMA ou une évolution qui [[tient la prod]].'
   },
 
-  proof: {
-    layout: 'bento',
-    kicker: 'EXPERTISE',
-    title: 'Deux clouds, une plateforme.',
-    sub: 'Le pipeline des commerciaux, les portails des clients.',
-    meta: 'SALES CLOUD — EXPERIENCE CLOUD — APEX — AGENTFORCE',
-    features: [
-      { size: 'big',  illu: 'illustrations/fe-1.svg', title: 'Sales Cloud', meta: 'LEADS — PIPELINE — FORECAST — TMA' },
-      { size: 'tall', illu: 'illustrations/fe-2.svg', title: 'Apex & Flows', meta: 'CLASSES — TRIGGERS — BATCH — AUTOMATION' },
-      { size: 'tall', illu: 'illustrations/fe-3.svg', title: 'Experience Cloud', meta: 'PORTAILS — BUILDER — CMS — LWR' },
-      { size: 'big',  illu: 'illustrations/fe-4.svg', title: 'Agentforce & IA', meta: 'SPECIALIST — AI ASSOCIATE — CRM' }
+  skills: {
+    kicker: 'SKILLS',
+    title: 'My Skills',
+    copy: [
+      'Deux clouds, une plateforme. Sales Cloud en production, Experience Cloud côté portails, Apex et Flows quand le paramétrage ne suffit plus.',
+      'Le socle vient du full-stack — Laravel, HTML, CSS — et de la TMA au quotidien, tickets Jira compris. Bilingue français et anglais.'
+    ],
+    groups: [
+      {
+        title: 'Salesforce',
+        items: [
+          { name: 'Sales Cloud', level: 90 },
+          { name: 'Apex & Flows', level: 86 },
+          { name: 'Experience Cloud', level: 78 },
+          { name: 'Agentforce & IA', level: 72 }
+        ]
+      },
+      {
+        title: 'Socle & collab',
+        items: [
+          { name: 'TMA / Jira', level: 88 },
+          { name: 'HTML / CSS', level: 82 },
+          { name: 'Laravel / PHP', level: 76 }
+        ]
+      }
     ]
   },
 
@@ -146,28 +160,21 @@ window.SITE_CONTENT = {
     );
   }
 
-  // 4 · preuve : masonry (8 photos) ou bento (4 features big/tall/tall/big)
-  const head = $$('.coll-head > *');
-  if (head.length === 4) {
-    head[0].textContent = C.proof.kicker;
-    head[1].textContent = C.proof.title;
-    head[2].textContent = C.proof.sub;
-    head[3].textContent = C.proof.meta;
-  }
-  const grid = $('#collGrid');
-  if (grid && C.proof.layout === 'bento') {
-    grid.className = 'bento-grid';
-    grid.innerHTML = C.proof.features.map((f) =>
-      `<figure class="card${f.size ? ' b-' + f.size : ''}"><div class="card-img"><img src="${f.illu}" alt="${f.title}"></div><figcaption>${f.title}<span class="mono">${f.meta}</span></figcaption></figure>`
-    ).join('');
-  } else if (grid) {
-    grid.className = 'coll-grid';
-    const SPEEDS = [-0.05, 0.06, -0.028, 0.085];
-    grid.innerHTML = SPEEDS.map((s, ci) =>
-      `<div class="col" data-pspeed="${s}">` +
-      C.proof.projects.slice(ci * 2, ci * 2 + 2).map((p) =>
-        `<figure class="card"><div class="card-img"><img src="${p.img}" alt="${p.title} — ${p.meta}"></div><figcaption>${p.title}<span class="mono">${p.meta}</span></figcaption></figure>`
-      ).join('') + '</div>'
+  // 4 · compétences
+  set('#skillsKicker', C.skills.kicker);
+  set('#skillsTitle', C.skills.title);
+  const skillsCopy = $('#skillsCopy');
+  if (skillsCopy) skillsCopy.innerHTML = (C.skills.copy || []).map((p) => `<p>${p}</p>`).join('');
+  const skillsGroups = $('#skillsGroups');
+  if (skillsGroups) {
+    let i = 0;
+    skillsGroups.innerHTML = (C.skills.groups || []).map((g) =>
+      `<div class="skill-group"><h3>${g.title}</h3>` +
+      g.items.map((it) => {
+        const n = i++;
+        return `<div class="skill" style="--i:${n}"><p>${it.name}</p><div class="skill-bar" role="meter" aria-label="${it.name}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${it.level}"><i style="--p:${it.level}%"></i></div></div>`;
+      }).join('') +
+      `</div>`
     ).join('');
   }
 

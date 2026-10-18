@@ -250,7 +250,7 @@ body.is-ready .fl img { transform: scale(1); }
 .collection {
   position: relative;
   background: var(--white);
-  padding: 14vh var(--gutter) 30vh;
+  padding: 14vh var(--gutter) 14vh;
   margin-top: -100vh; /* recouvre le manifeste grisé SUR PLACE, pendant son épinglage */
   z-index: 2;
   overflow: visible;
@@ -304,6 +304,59 @@ body.is-ready .fl img { transform: scale(1); }
 .bento-grid .card-img { flex: 1; min-height: 0; }
 .bento-grid .card-img img { width: 100%; height: 100%; object-fit: cover; }
 .bento-grid figcaption { margin-top: 12px; }
+
+/* ═══════════ COMPÉTENCES ═══════════ */
+.skills {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: start;
+  padding: 16vh var(--gutter) 28vh;
+}
+.skills-kicker, #skillsKicker { margin-bottom: 10px; }
+.skills-title {
+  font-size: var(--t-heading);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  display: inline-block;
+  padding-bottom: 12px;
+  border-bottom: 1.5px solid var(--ink);
+  margin: 0 0 28px;
+}
+.skills-copy {
+  max-width: 44ch;
+  color: var(--ash);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.skills-copy p + p { margin-top: 14px; }
+.skills-groups { padding-top: 2.4em; }
+.skill-group + .skill-group { margin-top: 46px; }
+.skill-group h3 {
+  font-size: 23px;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  margin-bottom: 26px;
+}
+.skill { margin-bottom: 22px; }
+.skill p { font-size: 16px; margin-bottom: 9px; }
+.skill-bar {
+  height: 2px;
+  background: rgba(var(--ink-rgb), 0.16);
+  overflow: hidden;
+}
+.skill-bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--lime);
+  transition: width 1.2s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.skills.in-view .skill-bar i { width: var(--p); }
 
 /* ═══════════ S4 · BANDE LIME ═══════════ */
 .band { position: relative; z-index: 3; margin-top: -20vh; }
@@ -551,7 +604,7 @@ body.is-ready .fl img { transform: scale(1); }
   transition: transform .9s var(--ease-out) .15s, opacity .32s var(--ease-out);
 }
 body.is-ready .dock { transform: translate(-50%, 0); }
-.dock-wordmark { font-size: 19px; letter-spacing: -0.01em; font-weight: 500; margin-right: 14px; }
+.dock-wordmark { font-size: 19px; letter-spacing: -0.01em; font-weight: 500; margin-right: 14px; white-space: nowrap; }
 .dock-nav { display: flex; gap: 4px; margin-right: 8px; }
 .dock-link { padding: 9px 10px; position: relative; }
 .dock-link::after {
@@ -595,7 +648,8 @@ body.static .callout { display: none; }
 body.static .s-fill .pin { padding: 14vh 0; }
 body.static .fill-text { width: auto; max-width: 800px; padding: 0 var(--gutter); }
 body.static .fill-text .fc { color: var(--ink); }
-body.static .collection { padding-bottom: 26vh; margin-top: 0; }
+body.static .collection { padding-bottom: 10vh; margin-top: 0; }
+body.static .skills { margin-top: 0; padding: 8vh var(--gutter) 12vh; }
 body.static .coll-grid { grid-template-columns: repeat(2, 1fr); }
 body.static .bento-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: minmax(240px, auto); }
 body.static .b-big  { grid-column: span 2; grid-row: span 1; }
@@ -756,6 +810,13 @@ body.static .footer-name .chi { transform: none; }
   .coll-grid { grid-template-columns: 1fr 1fr !important; }
   .bento-grid { grid-template-columns: 1fr 1fr; }
   .card figcaption { font-size: 15px; }
+  .skills {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    padding: 8vh var(--gutter) 18vh;
+  }
+  .skills-groups { padding-top: 0; }
+  .skills-title { font-size: clamp(40px, 12vw, 57px); }
   .mw { font-size: clamp(40px, 13vw, 68px); }
 
   /* processus */
@@ -785,7 +846,8 @@ body.static .footer-name .chi { transform: none; }
   body.static .hero-copy { min-height: 64vh; }
   body.static .spot { height: 74vh; }
   body.static .s-fill .pin { padding: 9vh 0; }
-  body.static .collection { padding-bottom: 12vh; }
+  body.static .collection { padding-bottom: 8vh; }
+  body.static .skills { margin-top: 0; padding: 6vh var(--gutter) 10vh; }
   body.static .s-motto .pin { padding: 8vh var(--gutter); }
   body.static .s-quote .pin { padding: 9vh var(--gutter); }
   body.static .s-final .pin { min-height: 0; padding: 9vh 0; }
